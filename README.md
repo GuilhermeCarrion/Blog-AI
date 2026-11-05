@@ -55,6 +55,20 @@ Projeto de estudo de fundamentos de Node.js: o servidor usa apenas o módulo nat
    npm run dev
    ```
 
+## Documentação (Swagger)
+
+Com a API rodando, a documentação interativa fica em [http://localhost:8080/docs](http://localhost:8080/docs) e a especificação OpenAPI em `/openapi.json`. A spec fica em `src/docs/openapi.js`; ao criar ou alterar uma rota, atualize-a junto.
+
+## Testes
+
+Testes de integração com o `node:test` nativo: sobem a API numa porta livre e usam o Postgres do Docker, então o banco precisa estar rodando e migrado.
+
+```bash
+npm test
+```
+
+Os testes não chamam a Groq: os rascunhos são inseridos direto no banco, e cada teste apaga o que criou.
+
 ## Endpoints
 
 | Método | Rota | Descrição | Sucesso |
@@ -105,7 +119,9 @@ Só posts em `draft` podem mudar de status. O banco também recusa qualquer stat
 
 ```
 src/
-├── index.js                          # servidor HTTP e rotas
+├── index.js                          # sobe o servidor (listen)
+├── app.js                            # servidor HTTP e rotas
+├── docs/openapi.js                   # spec OpenAPI e página do Swagger UI
 ├── http/helpers.js                   # sendJson, readJsonBody
 ├── errors/http-error.js              # erro com status code
 ├── agents/writer-agent.js            # agente redator (Mastra + Groq)
@@ -116,9 +132,11 @@ src/
 └── database/
     ├── connection.js                 # pool de conexões
     └── migrate.js                    # cria a tabela posts
+test/
+└── posts.test.js                     # testes de integração das rotas
 ```
 
-As camadas só conversam com a de baixo: **rotas → services → repositories / agente → banco**. Trocar o `node:http` por Express, por exemplo, mudaria apenas o `index.js`.
+As camadas só conversam com a de baixo: **rotas → services → repositories / agente → banco**. Trocar o `node:http` por Express, por exemplo, mudaria apenas o `app.js`.
 
 ## Banco de dados
 
